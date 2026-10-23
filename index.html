@@ -1,1 +1,317 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="Blecaco connects your Android phone to Blender for intuitive 3D camera control.">
+  <title>Blecaco — Blender Camera Controller</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1020;
+      --panel: #151d30;
+      --text: #f4f7ff;
+      --muted: #a8b3ca;
+      --accent: #9b8cff;
+      --line: #29334b;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.7;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      width: min(1100px, 90%);
+      margin: auto;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+    }
+
+    nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .hero {
+      padding: 100px 0 90px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-size: .8rem;
+    }
+
+    h1 {
+      max-width: 850px;
+      margin: 20px auto;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      line-height: 1.12;
+      letter-spacing: -3px;
+    }
+
+    .hero p {
+      max-width: 650px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 1.15rem;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 32px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 12px 22px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-weight: 700;
+      transition: transform .2s, background .2s;
+    }
+
+    .button:hover { transform: translateY(-2px); }
+
+    .primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #111027;
+    }
+
+    .preview {
+      margin: 20px auto 0;
+      max-width: 850px;
+      min-height: 210px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background:
+        radial-gradient(ellipse at center, #283657 0%, #151d30 65%);
+      display: grid;
+      place-items: center;
+    }
+
+    .camera-icon {
+      font-size: 5rem;
+      filter: drop-shadow(0 0 30px #9b8cff66);
+    }
+
+    section { padding: 65px 0; }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      line-height: 1.2;
+    }
+
+    .section-heading p, .muted { color: var(--muted); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      padding: 25px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .card-icon { font-size: 2rem; }
+
+    .card h3 { margin-bottom: 8px; }
+
+    .card p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .download-panel {
+      padding: 40px;
+      text-align: center;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+    }
+
+    .download-panel p {
+      color: var(--muted);
+      max-width: 620px;
+      margin: 12px auto;
+    }
+
+    .notice {
+      margin-top: 24px;
+      padding: 14px;
+      border-radius: 10px;
+      background: #0b1020;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    footer {
+      margin-top: 60px;
+      border-top: 1px solid var(--line);
+      padding: 28px 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    @media (max-width: 700px) {
+      .hero { padding: 65px 0; }
+      h1 { letter-spacing: -1.5px; }
+      .nav-links { gap: 12px; font-size: .85rem; }
+      .grid { grid-template-columns: 1fr; }
+      .download-panel { padding: 25px 18px; }
+      .preview { min-height: 160px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="container">
+      <a class="logo" href="#">Blea<span>caco</span></a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/CantanTam/Blecaco-office">GitHub</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero container">
+      <div class="eyebrow">A mobile companion for Blender</div>
+      <h1>Control your Blender camera with your phone.</h1>
+      <p>
+        Blecaco is a project exploring intuitive mobile camera control
+        for Blender, bringing your 3D workflow closer to your hands.
+      </p>
+      <div class="actions">
+        <a class="button primary" href="#download">Get Blecaco</a>
+        <a class="button" href="#features">Explore Features</a>
+      </div>
+      <div class="preview">
+        <div>
+          <div class="camera-icon">◈</div>
+          <p class="muted">Your phone. Your camera. Your 3D world.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="container">
+        <div class="section-heading">
+          <div class="eyebrow">What we're building</div>
+          <h2>Designed for a more natural workflow.</h2>
+          <p>Explore the key ideas behind Blecaco.</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <div class="card-icon">📱</div>
+            <h3>Mobile Control</h3>
+            <p>Use a phone as a dedicated controller for your Blender camera.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">🎥</div>
+            <h3>Live Viewport</h3>
+            <p>Work toward viewing your Blender viewport on your mobile device.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">🧭</div>
+            <h3>Motion Interaction</h3>
+            <p>Explore motion-based input and touch controls for 3D navigation.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="download">
+      <div class="container">
+        <div class="download-panel">
+          <div class="eyebrow">Get started</div>
+          <h2>Follow the development of Blecaco.</h2>
+          <p>
+            Visit the project repository for source code, development
+            updates, and future release downloads.
+          </p>
+          <div class="actions">
+            <a class="button primary"
+               href="https://github.com/CantanTam/Blecaco-office/releases">
+              View Releases
+            </a>
+            <a class="button"
+               href="https://github.com/CantanTam/Blecaco-office">
+              Source Code
+            </a>
+          </div>
+          <div class="notice">
+            Downloads will be added here when public releases are available.
+            Blecaco is a work in progress.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <span>© 2026 Blecaco Project</span>
+      <a href="https://github.com/CantanTam/Blecaco-office">GitHub Repository</a>
+    </div>
+  </footer>
+</body>
+</html>
+
