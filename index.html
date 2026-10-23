@@ -1,317 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111827">
-  <meta name="description" content="Blecaco connects your Android phone to Blender for intuitive 3D camera control.">
-  <title>Blecaco — Blender Camera Controller</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #0b1020;
-      --panel: #151d30;
-      --text: #f4f7ff;
-      --muted: #a8b3ca;
-      --accent: #9b8cff;
-      --line: #29334b;
-    }
-
-    * { box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: system-ui, -apple-system, sans-serif;
-      line-height: 1.7;
-    }
-
-    a { color: inherit; text-decoration: none; }
-
-    .container {
-      width: min(1100px, 90%);
-      margin: auto;
-    }
-
-    header {
-      border-bottom: 1px solid var(--line);
-    }
-
-    nav {
-      min-height: 76px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      letter-spacing: -1px;
-    }
-
-    .logo span { color: var(--accent); }
-
-    .nav-links {
-      display: flex;
-      gap: 24px;
-      color: var(--muted);
-      font-size: .95rem;
-    }
-
-    .hero {
-      padding: 100px 0 90px;
-      text-align: center;
-    }
-
-    .eyebrow {
-      color: var(--accent);
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-size: .8rem;
-    }
-
-    h1 {
-      max-width: 850px;
-      margin: 20px auto;
-      font-size: clamp(2.5rem, 7vw, 5rem);
-      line-height: 1.12;
-      letter-spacing: -3px;
-    }
-
-    .hero p {
-      max-width: 650px;
-      margin: 0 auto;
-      color: var(--muted);
-      font-size: 1.15rem;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-top: 32px;
-    }
-
-    .button {
-      display: inline-block;
-      padding: 12px 22px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      font-weight: 700;
-      transition: transform .2s, background .2s;
-    }
-
-    .button:hover { transform: translateY(-2px); }
-
-    .primary {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #111027;
-    }
-
-    .preview {
-      margin: 20px auto 0;
-      max-width: 850px;
-      min-height: 210px;
-      padding: 28px;
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      background:
-        radial-gradient(ellipse at center, #283657 0%, #151d30 65%);
-      display: grid;
-      place-items: center;
-    }
-
-    .camera-icon {
-      font-size: 5rem;
-      filter: drop-shadow(0 0 30px #9b8cff66);
-    }
-
-    section { padding: 65px 0; }
-
-    .section-heading {
-      text-align: center;
-      margin-bottom: 35px;
-    }
-
-    h2 {
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
-      line-height: 1.2;
-    }
-
-    .section-heading p, .muted { color: var(--muted); }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .card {
-      padding: 25px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-    }
-
-    .card-icon { font-size: 2rem; }
-
-    .card h3 { margin-bottom: 8px; }
-
-    .card p {
-      margin-bottom: 0;
-      color: var(--muted);
-    }
-
-    .download-panel {
-      padding: 40px;
-      text-align: center;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-    }
-
-    .download-panel p {
-      color: var(--muted);
-      max-width: 620px;
-      margin: 12px auto;
-    }
-
-    .notice {
-      margin-top: 24px;
-      padding: 14px;
-      border-radius: 10px;
-      background: #0b1020;
-      color: var(--muted);
-      font-size: .9rem;
-    }
-
-    footer {
-      margin-top: 60px;
-      border-top: 1px solid var(--line);
-      padding: 28px 0;
-      color: var(--muted);
-      font-size: .9rem;
-    }
-
-    footer .container {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    @media (max-width: 700px) {
-      .hero { padding: 65px 0; }
-      h1 { letter-spacing: -1.5px; }
-      .nav-links { gap: 12px; font-size: .85rem; }
-      .grid { grid-template-columns: 1fr; }
-      .download-panel { padding: 25px 18px; }
-      .preview { min-height: 160px; }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <nav class="container">
-      <a class="logo" href="#">Blea<span>caco</span></a>
-      <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#download">Download</a>
-        <a href="https://github.com/CantanTam/Blecaco-office">GitHub</a>
-      </div>
-    </nav>
-  </header>
-
-  <main>
-    <section class="hero container">
-      <div class="eyebrow">A mobile companion for Blender</div>
-      <h1>Control your Blender camera with your phone.</h1>
-      <p>
-        Blecaco is a project exploring intuitive mobile camera control
-        for Blender, bringing your 3D workflow closer to your hands.
-      </p>
-      <div class="actions">
-        <a class="button primary" href="#download">Get Blecaco</a>
-        <a class="button" href="#features">Explore Features</a>
-      </div>
-      <div class="preview">
-        <div>
-          <div class="camera-icon">◈</div>
-          <p class="muted">Your phone. Your camera. Your 3D world.</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="features">
-      <div class="container">
-        <div class="section-heading">
-          <div class="eyebrow">What we're building</div>
-          <h2>Designed for a more natural workflow.</h2>
-          <p>Explore the key ideas behind Blecaco.</p>
-        </div>
-        <div class="grid">
-          <article class="card">
-            <div class="card-icon">📱</div>
-            <h3>Mobile Control</h3>
-            <p>Use a phone as a dedicated controller for your Blender camera.</p>
-          </article>
-          <article class="card">
-            <div class="card-icon">🎥</div>
-            <h3>Live Viewport</h3>
-            <p>Work toward viewing your Blender viewport on your mobile device.</p>
-          </article>
-          <article class="card">
-            <div class="card-icon">🧭</div>
-            <h3>Motion Interaction</h3>
-            <p>Explore motion-based input and touch controls for 3D navigation.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="download">
-      <div class="container">
-        <div class="download-panel">
-          <div class="eyebrow">Get started</div>
-          <h2>Follow the development of Blecaco.</h2>
-          <p>
-            Visit the project repository for source code, development
-            updates, and future release downloads.
-          </p>
-          <div class="actions">
-            <a class="button primary"
-               href="https://github.com/CantanTam/Blecaco-office/releases">
-              View Releases
-            </a>
-            <a class="button"
-               href="https://github.com/CantanTam/Blecaco-office">
-              Source Code
-            </a>
-          </div>
-          <div class="notice">
-            Downloads will be added here when public releases are available.
-            Blecaco is a work in progress.
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container">
-      <span>© 2026 Blecaco Project</span>
-      <a href="https://github.com/CantanTam/Blecaco-office">GitHub Repository</a>
-    </div>
-  </footer>
-</body>
-</html>
-
+<svg
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 297 210"
+   version="1.1"
+   id="svg1"
+   xml:space="preserve"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   sodipodi:docname="page.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.0289352"
+     inkscape:cx="640.95388"
+     inkscape:cy="375.63105"
+     inkscape:window-width="2560"
+     inkscape:window-height="1354"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" /><defs
+     id="defs1"><rect
+       x="343.07312"
+       y="221.5883"
+       width="550.08324"
+       height="248.8009"
+       id="rect3" /><rect
+       x="343.07312"
+       y="221.5883"
+       width="550.08324"
+       height="248.8009"
+       id="rect4" /><rect
+       x="343.07312"
+       y="221.5883"
+       width="550.08324"
+       height="248.8009"
+       id="rect6" /><rect
+       x="343.07312"
+       y="221.5883"
+       width="550.08324"
+       height="248.8009"
+       id="rect8" /></defs><g
+     inkscape:label="图层 1"
+     inkscape:groupmode="layer"
+     id="layer1"><rect
+       style="opacity:0.3;fill:#ff0000;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="rect1"
+       width="237.21147"
+       height="137.82858"
+       x="31.885715"
+       y="16.457142"
+       ry="4.4956026" /><rect
+       style="opacity:1;fill:#1868db;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="rect2"
+       width="61.714283"
+       height="20.571428"
+       x="122.4"
+       y="160.2"
+       ry="10.285714" /><text
+       xml:space="preserve"
+       transform="matrix(0.23655035,0,0,0.23655035,0.357352,10.589815)"
+       id="text2"
+       style="font-size:42.6667px;line-height:1.3;font-family:Bahnschrift;-inkscape-font-specification:Bahnschrift;text-align:center;letter-spacing:2.13px;word-spacing:5.29px;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect3);opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"><tspan
+         x="551.98421"
+         y="265.53459"
+         id="tspan2"><tspan
+           style="font-weight:300;font-family:'思源黑体 CN';-inkscape-font-specification:'思源黑体 CN Light'"
+           id="tspan1">视频框</tspan></tspan></text><text
+       xml:space="preserve"
+       transform="matrix(0.23655035,0,0,0.23655035,5.7573523,110.61839)"
+       id="text4"
+       style="font-size:42.6667px;line-height:1.3;font-family:Bahnschrift;-inkscape-font-specification:Bahnschrift;text-align:center;letter-spacing:2.13px;word-spacing:5.29px;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect4);opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"><tspan
+         x="532.53157"
+         y="265.53459"
+         id="tspan8"><tspan
+           style="font-weight:300;font-family:'思源黑体 CN';-inkscape-font-specification:'思源黑体 CN Light'"
+           id="tspan3">下载</tspan><tspan
+           style="font-weight:300;font-family:'思源黑体 CN';-inkscape-font-specification:'思源黑体 CN Light'"
+           id="tspan6">APP</tspan></tspan></text><rect
+       style="opacity:1;fill:#1868db;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="rect5"
+       width="76.371422"
+       height="20.571426"
+       x="193.37143"
+       y="159.17143"
+       ry="10.285713" /><text
+       xml:space="preserve"
+       transform="matrix(0.23655035,0,0,0.23655035,82.90021,110.87553)"
+       id="text5"
+       style="font-size:42.6667px;line-height:1.3;font-family:Bahnschrift;-inkscape-font-specification:Bahnschrift;text-align:center;letter-spacing:2.13px;word-spacing:5.29px;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6);opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"><tspan
+         x="497.2708"
+         y="265.53459"
+         id="tspan11"><tspan
+           style="font-weight:300;font-family:'思源黑体 CN';-inkscape-font-specification:'思源黑体 CN Light'"
+           id="tspan9">下载</tspan><tspan
+           style="font-weight:300;font-family:'思源黑体 CN';-inkscape-font-specification:'思源黑体 CN Light'"
+           id="tspan10">ADDON</tspan></tspan></text><rect
+       style="opacity:1;fill:#666666;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="rect7"
+       width="61.714283"
+       height="20.571428"
+       x="53.608368"
+       y="160.2"
+       ry="10.285714" /><text
+       xml:space="preserve"
+       transform="matrix(0.23655035,0,0,0.23655035,-63.034318,110.61839)"
+       id="text7"
+       style="font-size:42.6667px;line-height:1.3;font-family:Bahnschrift;-inkscape-font-specification:Bahnschrift;text-align:center;letter-spacing:2.13px;word-spacing:5.29px;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8);opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"><tspan
+         x="529.58586"
+         y="265.53459"
+         id="tspan13"><tspan
+           style="font-weight:300;font-family:'思源黑体 CN';-inkscape-font-specification:'思源黑体 CN Light'"
+           id="tspan12">我的主页</tspan></tspan></text></g></svg>
