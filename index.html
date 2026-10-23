@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="icon" type="image/svg+xml" href="WEB_ICON.svg">
+  <meta name="description" content="Blecaco：使用 Android 手机控制 Blender 摄像头的开源项目。">
+  <title>Blecaco — Blender Camera Controller</title>
+  <style>
+    /* ============================================================
+      可调参数区：想改标题栏 / Logo / 视频框 / 打字特效，优先只改这里
+       ============================================================ */
+    :root {
+      /* ---------- 页面基础色 ---------- */
+      --text: #eaf0ff;
+      --muted: #edf1ff;
+      --video-bg: #10131b;
+      --page-bg: #081022;
+
+      /* ---------- 标题栏 ---------- */
+      --bar-bg: rgb(255 255 255 / 90%);      /* 标题栏背景颜色 */
+      --bar-height: 60px;                     /* 桌面端标题栏高度 */
+      --bar-height-mobile: 60px;              /* 手机端（≤700px）标题栏高度 */
+      --bar-font-size: clamp(10px, 2.7vw, 15px); /* 文字大小（手机端自动缩小，范围 10-15px） */
+      --bar-text-color: #2f4bc9;              /* 文字颜色；hover 色块也使用这个颜色 */
+      --bar-border: rgb(255 255 255 / 45%);   /* 标题栏底部分隔线颜色 */
+      --bar-side-padding: 3vw;                /* 左右留白：logo 距标题栏左边缘的距离（默认与视频左右留白一致） */
+      /* 苹果优先使用系统字体，Windows / Linux 优先使用微软雅黑 */
+      --bar-font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+        "Microsoft YaHei", "Microsoft YaHei UI", "微软雅黑",
+        "Noto Sans CJK SC", "Source Han Sans SC", "WenQuanYi Micro Hei", sans-serif;
+
+      /* ---------- 左上角 Logo ---------- */
+      --logo-width: 100px;                    /* 桌面端 logo 宽度 */
+      --logo-height: 40px;                    /* 桌面端 logo 高度 */
+      --logo-width-mobile: 76px;              /* 手机端 logo 宽度 */
+      --logo-height-mobile: 36px;             /* 手机端 logo 高度 */
+      --logo-width-small: 62px;               /* 小屏（≤350px）logo 宽度 */
+      --logo-height-small: 36px;              /* 小屏（≤350px）logo 高度 */
+
+      /* ---------- 视频播放框 ---------- */
+      --video-width: 1200px;                  /* 视频框最大宽度，可写 px 或 % */
+      --video-radius: 0px;                   /* 视频框圆角（桌面端） */
+      --video-radius-mobile: 0px;             /* 视频框圆角（手机端） */
+      --video-top-gap: clamp(45px, 2.4vh, 30px); /* 视频框顶部距标题栏底部的距离（桌面端） */
+      --video-top-gap-mobile: 8px;            /* 视频框顶部距标题栏底部的距离（手机端） */
+      --video-shadow-color: rgba(255, 235, 235, 0.55); /* 视频框阴影颜色 */
+      --video-shadow-size: 8px;              /* 视频框阴影大小（模糊半径，越大越柔和） */
+      --video-shadow-offset-y: 0px;          /* 阴影上下偏移；0px = 四周均匀，正数向下，负数向上 */
+
+      /* ---------- 打字特效 ---------- */
+      --typing-font-size: clamp(28px, 1.55vw, 23px);        /* 桌面端文字大小（自适应范围） */
+      --typing-font-size-mobile: clamp(14px, 3.7vw, 18px);  /* 手机端文字大小（自适应范围） */
+      --typing-text-opacity: 0.6;                /* 打字文字透明度：0 完全透明，1 完全不透明 */
+      --typing-initial-delay: 2000ms;         /* 第一次打开页面后等待多久才开始打字（只生效一次） */
+      --typing-speed: 140ms;                   /* 每个字的基础打字间隔 */
+      --typing-speed-random: 60ms;            /* 每个字的随机附加间隔；0ms 表示固定节奏 */
+      --typing-hold: 3000ms;                  /* 每行打完后的停留时间 */
+      --typing-fade: 320ms;                   /* 每行淡出时间（CSS 与 JS 共用） */
+    }
+
+    /* 手机端自动套用上面的手机参数，无需改下面的映射 */
+    @media (max-width: 700px) {
+      :root {
+        --bar-height: var(--bar-height-mobile);
+        --logo-width: var(--logo-width-mobile);
+        --logo-height: var(--logo-height-mobile);
+        --video-radius: var(--video-radius-mobile);
+        --video-top-gap: var(--video-top-gap-mobile);
+      }
+    }
+
+    @media (max-width: 350px) {
+      :root {
+        --logo-width: var(--logo-width-small);
+        --logo-height: var(--logo-height-small);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    html {
+      scroll-behavior: smooth;
+      min-height: 100%;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      min-width: 280px;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: var(--page-bg);
+      background-image:
+        radial-gradient(900px 520px at 10% -8%, rgb(70 105 255 / 26%), transparent 62%),
+        radial-gradient(900px 560px at 100% 10%, rgb(26 58 150 / 24%), transparent 60%),
+        linear-gradient(160deg, var(--page-bg) 0%, #0b1936 52%, #050a14 100%);
+      background-attachment: fixed;
+    }
+
+    a { color: inherit; }
+
+    /* 白色磨砂标题栏：左侧 Logo，右侧菜单从右到左为 下载ADDON、下载APP、使用教程、我的主页 */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      width: 100%;
+      font-family: var(--bar-font);
+      background: var(--bar-bg);
+      border-bottom: 1px solid var(--bar-border);
+      box-shadow: 0 10px 32px rgb(0 0 0 / 28%);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+    }
+
+    .nav-container {
+      width: 100%;
+      max-width: 1680px;
+      min-height: var(--bar-height);
+      margin: 0 auto;
+      padding-inline: var(--bar-side-padding);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+    }
+
+    /* Logo 仅作展示，不绑定点击行为 */
+    .site-logo-wrap {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: var(--logo-width);
+      height: var(--logo-height);
+    }
+
+    .site-logo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: left center;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 0;
+      margin-left: auto;
+    }
+
+    /* 悬停时整块反色：蓝底白字，高度铺满标题栏 */
+    .nav-links a {
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      align-items: center;
+      height: var(--bar-height);
+      padding: 0 clamp(12px, 1.2vw, 22px);
+      color: var(--bar-text-color);
+      font-size: var(--bar-font-size);
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 100ms ease;
+    }
+
+    /* 用伪元素做色块，只淡入淡出透明度，切换时不会出现生硬的闪动 */
+    .nav-links a::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: var(--bar-text-color);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 260ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-links a > span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: #ffffff;
+      transition: color 100ms ease 100ms;
+    }
+
+    .nav-links a:hover::before,
+    .nav-links a:focus-visible::before {
+      opacity: 1;
+    }
+
+    .nav-links a:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: -4px;
+    }
+
+    main {
+      flex: 1 0 auto;
+      width: min(94vw, 1600px);
+      margin: 0 auto;
+      padding-top: var(--video-top-gap);
+      padding-bottom: 24px;
+    }
+
+    /* 居中的 Bilibili 视频，宽度由 --video-width 控制 */
+    .video-frame {
+      position: relative;
+      width: min(100%, var(--video-width));
+      margin: 0 auto;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border: 1px solid rgb(140 165 255 / 18%);
+      border-radius: var(--video-radius);
+      background: var(--video-bg);
+      box-shadow: 0 var(--video-shadow-offset-y) var(--video-shadow-size) var(--video-shadow-color);
+    }
+
+    .video-frame iframe {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: var(--video-bg);
+    }
+
+    .intro-copy {
+      max-width: 1000px;
+      min-height: 1.9em;
+      margin: clamp(22px, 3vw, 36px) auto 0;
+      color: #e8edff;
+      font-size: var(--typing-font-size);
+      font-weight: 500;
+      line-height: 1.9;
+      letter-spacing: 0.025em;
+      text-align: center;
+      text-wrap: balance;
+      text-shadow: 0 1px 10px rgb(20 37 113 / 12%);
+    }
+
+    /* 打字机效果：文字逐字出现，整行淡出后开始下一行 */
+    .intro-typing {
+      transition: opacity var(--typing-fade) ease;
+    }
+
+    .intro-typing.is-hidden { opacity: 0; }
+
+    /* 只控制打字文字本身的透明度 */
+    #intro-typed {
+      opacity: var(--typing-text-opacity);
+    }
+
+    .intro-typing.is-reduced { white-space: pre-line; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .notice {
+      width: fit-content;
+      max-width: 100%;
+      margin: 18px auto 0;
+      padding: 8px 14px;
+      border: 1px solid rgb(140 165 255 / 24%);
+      border-radius: 8px;
+      background: rgb(74 108 247 / 10%);
+      color: #e8edff;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .notice:empty { display: none; }
+
+    /* 极简页脚：与标题栏一致的背景和文字颜色 */
+    .site-footer {
+      margin-top: clamp(40px, 6vw, 80px);
+      padding: 10px 24px;
+      border-top: 1px solid rgb(140 165 255 / 10%);
+      background: var(--bar-bg);
+      text-align: center;
+    }
+
+    .site-footer p {
+      margin: 0;
+      color: var(--bar-text-color);
+      font-size: 12.5px;
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+    }
+
+    @media (max-width: 700px) {
+      .nav-container {
+        gap: 12px;
+      }
+
+      .nav-links a {
+        padding: 0 10px;
+      }
+
+      main {
+        width: 94vw;
+        padding-bottom: 20px;
+      }
+
+      .intro-copy {
+        max-width: 620px;
+        margin-top: 20px;
+        font-size: var(--typing-font-size-mobile);
+        line-height: 1.8;
+      }
+    }
+
+    @media (max-width: 350px) {
+      .nav-container { gap: 8px; }
+      .nav-links a { padding: 0 6px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .nav-links a,
+      .nav-links a::before { transition: none; }
+      .intro-typing { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-container">
+      <!-- Logo 图片位于仓库根目录，与 index.html 同级 -->
+      <div class="site-logo-wrap">
+        <img class="site-logo" src="WEB_ICON.svg" alt="Blecaco Logo">
+      </div>
+
+      <nav class="nav-links" aria-label="主导航">
+        <!-- row-reverse 使导航栏从右到左依次为 下载ADDON、下载APP、使用教程、我的主页 -->
+        <a id="addon-link" href="https://github.com/CantanTam/blecaco" target="_blank" rel="noopener noreferrer"><span>下载ADDON</span></a>
+        <a id="app-link" href="https://github.com/CantanTam/blecaco_phone" target="_blank" rel="noopener noreferrer"><span>下载APP</span></a>
+        <a id="guide-link" href="#guide"><span>使用教程</span></a>
+        <a id="homepage-link" href="https://space.bilibili.com/391504171" target="_blank" rel="noopener noreferrer"><span>我的主页</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="video-frame" aria-label="Blecaco 哔哩哔哩视频介绍">
+      <iframe
+        id="bilibili-player"
+        title="Blecaco 视频介绍（哔哩哔哩）"
+        allow="fullscreen; picture-in-picture; autoplay; clipboard-write; encrypted-media; web-share"
+        allowfullscreen
+        referrerpolicy="strict-origin-when-cross-origin"
+        loading="eager"
+        hidden>
+      </iframe>
+    </section>
+
+    <p class="intro-copy">
+      <span class="sr-only">使用手机控制你的blender摄像头，实现真实电影拍摄效果，提供6种拍摄模式，应对不同使用场景。</span>
+      <span class="intro-typing" aria-hidden="true"><span id="intro-typed"></span></span>
+    </p>
+    <p class="notice" id="notice" role="status" aria-live="polite"></p>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 CantanTam · 按开源许可证发布</p>
+  </footer>
+
+  <script>
+    /* 后续只需编辑这里的地址，不需要改动页面布局。
+       APP_URL / ADDON_URL / GUIDE_URL 可填写对应项目的 GitHub 仓库、Releases 页面或教程网页。 */
+    const SITE_CONFIG = {
+      BILIBILI_VIDEO_URL: "https://www.bilibili.com/video/BV1qD4y1U7fs/",
+      BILIBILI_PAGE: 1,
+      HOMEPAGE_URL: "https://space.bilibili.com/391504171",
+      APP_URL: "https://github.com/CantanTam/blecaco_phone",
+      ADDON_URL: "https://github.com/CantanTam/blecaco",
+      GUIDE_URL: ""
+    };
+
+    const player = document.getElementById("bilibili-player");
+    const notice = document.getElementById("notice");
+
+    function getBilibiliPlayerUrl(input, fallbackPage = 1) {
+      const value = input.trim();
+      if (!value) return "";
+
+      // 完整播放器地址可以直接使用。
+      if (/^https?:\/\/player\.bilibili\.com\//i.test(value)) return value;
+
+      // 普通 B 站视频链接或 BV 号均可使用。
+      const bvidMatch = value.match(/BV[0-9A-Za-z]+/);
+      if (!bvidMatch) return "";
+
+      let page = fallbackPage;
+      try {
+        if (/^https?:\/\//i.test(value)) {
+          const parsed = new URL(value);
+          const pageParam = Number.parseInt(parsed.searchParams.get("p"), 10);
+          if (Number.isFinite(pageParam) && pageParam > 0) page = pageParam;
+        }
+      } catch (_) {
+        // 若不是完整 URL，则继续使用找到的 BV 号。
+      }
+
+      return `https://player.bilibili.com/player.html?bvid=${encodeURIComponent(bvidMatch[0])}&page=${page}&danmaku=0&autoplay=0`;
+    }
+
+    function configureLink(id, url, label, newTab = true) {
+      const link = document.getElementById(id);
+      if (url && url.trim()) {
+        link.href = url.trim();
+        if (newTab) {
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        }
+      } else {
+        link.href = "#";
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          notice.textContent = `${label}链接尚未设置。之后在 index.html 中的 SITE_CONFIG 里填写对应地址即可。`;
+        });
+      }
+    }
+
+    const playerUrl = getBilibiliPlayerUrl(
+      SITE_CONFIG.BILIBILI_VIDEO_URL,
+      SITE_CONFIG.BILIBILI_PAGE
+    );
+
+    if (playerUrl) {
+      player.src = playerUrl;
+      player.hidden = false;
+    }
+
+    configureLink("homepage-link", SITE_CONFIG.HOMEPAGE_URL, "我的主页");
+    configureLink("app-link", SITE_CONFIG.APP_URL, "Android APP");
+    configureLink("addon-link", SITE_CONFIG.ADDON_URL, "Blender ADDON");
+    configureLink("guide-link", SITE_CONFIG.GUIDE_URL, "使用教程");
+
+    // 循环打字机：逐字输入 → 停留 → 整行淡出 → 下一行
+    (() => {
+      const typed = document.getElementById("intro-typed");
+      const typing = document.querySelector(".intro-typing");
+      if (!typed || !typing) return;
+
+      const lines = [
+        "使用手机控制你的Blender摄像头",
+        "实现真实电影拍摄效果",
+        "提供6种拍摄模式",
+        "应对不同使用场景"
+      ];
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduceMotion) {
+        typed.textContent = lines.join("\n");
+        typing.classList.add("is-reduced");
+        return;
+      }
+
+      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      // 从 CSS 可调参数区读取打字速度（支持 90ms / 0.09s 写法）
+      const rootStyle = getComputedStyle(document.documentElement);
+      const readTime = (name, fallback) => {
+        const raw = rootStyle.getPropertyValue(name).trim();
+        if (!raw) return fallback;
+        const value = Number.parseFloat(raw);
+        if (!Number.isFinite(value)) return fallback;
+        return raw.endsWith("s") && !raw.endsWith("ms") ? value * 1000 : value;
+      };
+
+      const initialDelay = readTime("--typing-initial-delay", 3000);
+      const typeSpeed = readTime("--typing-speed", 90);
+      const typeRandom = readTime("--typing-speed-random", 60);
+      const holdMs = readTime("--typing-hold", 1400);
+      const fadeMs = readTime("--typing-fade", 320);
+
+      const typeLine = async (line) => {
+        typed.textContent = "";
+        typing.classList.remove("is-hidden");
+
+        for (const char of Array.from(line)) {
+          typed.textContent += char;
+          // 每个字稍微随机一点，更像手动输入
+          await sleep(typeSpeed + Math.random() * typeRandom);
+        }
+
+        await sleep(holdMs);
+
+        typing.classList.add("is-hidden");
+        await sleep(fadeMs);
+      };
+
+      (async () => {
+        // 只有第一次打开页面时等待，之后进入循环不再等待
+        await sleep(initialDelay);
+
+        while (true) {
+          for (const line of lines) {
+            await typeLine(line);
+          }
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>
